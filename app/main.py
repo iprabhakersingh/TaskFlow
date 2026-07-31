@@ -7,6 +7,7 @@ from app.models.project import Project
 from app.api.project import router as project_router
 from app.api.tasks import router as task_router
 from app.models.task import Task
+from app.api import notification
 
 Base.metadata.create_all(bind=engine)
 
@@ -15,6 +16,7 @@ app = FastAPI(title="TaskFlow API")
 app.include_router(auth_router)
 app.include_router(project_router)
 app.include_router(task_router)
+app.include_router(notification.router)
 
 @app.get("/")
 def root():

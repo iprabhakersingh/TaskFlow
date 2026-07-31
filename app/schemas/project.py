@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-
+from datetime import datetime
 
 class ProjectCreate(BaseModel):
     name: str
@@ -14,6 +14,7 @@ class ProjectResponse(BaseModel):
     name: str
     description: str | None = None
     owner_id: int
+    created_at: datetime
 
     class Config:
         from_attributes = True
