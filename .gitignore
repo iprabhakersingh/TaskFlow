@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtual Environment
+venv/
+
+# Environment Variables
+.env
+
+# Celery Beat
+celerybeat-schedule*
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
