@@ -9,6 +9,12 @@ class TaskCreate(BaseModel):
     project_id: int
 
 
+class TaskUpdate(BaseModel):
+    title: str | None = None
+    description: str | None = None
+    status: str | None = None
+    
+
 class TaskResponse(BaseModel):
     id: int
     title: str
