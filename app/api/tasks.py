@@ -9,6 +9,9 @@ from app.models.user import User
 from app.schemas.task import TaskCreate, TaskUpdate, TaskResponse
 from app.core.dependencies import get_current_user
 
+from typing import Optional
+from datetime import datetime
+
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
 
 @router.post("/", response_model=TaskResponse)
@@ -45,12 +48,33 @@ def create_task(
 
 @router.get("/", response_model=list[TaskResponse])
 def get_tasks(
+    status: Optional[str] = None,
+    assignee: Optional[str] = None,
+    start_date: Optional[datetime] = None,
+    end_date: Optional[datetime] = None,
+    skip: int = 0,
+    limit: int = 10,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    query = db.query(Task).filter(Task.owner_id == current_user.id)
+
+    if status:
+        query = query.filter(Task.status == status)
+
+    if assignee:
+        query = query.filter(Task.assignee == assignee)
+
+    if start_date:
+        query = query.filter(Task.due_date >= start_date)
+
+    if end_date:
+        query = query.filter(Task.due_date <= end_date)
+
     tasks = (
-        db.query(Task)
-        .filter(Task.owner_id == current_user.id)
+        query
+        .offset(skip)
+        .limit(limit)
         .all()
     )
 
