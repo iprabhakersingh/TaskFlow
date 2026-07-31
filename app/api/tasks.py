@@ -15,13 +15,13 @@ from app.tasks.notification_tasks import create_notification
 
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
 
+
 @router.post("/", response_model=TaskResponse)
 def create_task(
     task: TaskCreate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-
     project = db.query(Project).filter(
         Project.id == task.project_id,
         Project.owner_id == current_user.id
@@ -31,14 +31,14 @@ def create_task(
         raise HTTPException(status_code=404, detail="Project not found")
 
     new_task = Task(
-    title=task.title,
-    description=task.description,
-    status=task.status,
-    assignee=task.assignee,
-    due_date=task.due_date,
-    project_id=task.project_id,
-    owner_id=current_user.id
-)
+        title=task.title,
+        description=task.description,
+        status=task.status,
+        assignee=task.assignee,
+        due_date=task.due_date,
+        project_id=task.project_id,
+        owner_id=current_user.id
+    )
 
     db.add(new_task)
     db.commit()
@@ -104,8 +104,8 @@ def update_task(
             detail="Task not found"
         )
 
-    # Store the old assignee before updating
-    old_assignee = task.assignee
+    # Store old status before updating
+    old_status = task.status
 
     update_data = task_data.model_dump(exclude_unset=True)
 
@@ -115,21 +115,22 @@ def update_task(
     db.commit()
     db.refresh(task)
 
-    # Trigger background notification if assignee changed
+    # Trigger background notification if status changed
     if (
-        "assignee" in update_data
-        and old_assignee != task.assignee
+        "status" in update_data
+        and old_status != task.status
     ):
         create_notification.delay(
             user_id=current_user.id,
             task_id=task.id,
             message=(
-                f"Task '{task.title}' was reassigned "
-                f"from '{old_assignee}' to '{task.assignee}'."
+                f"Task '{task.title}' status changed "
+                f"from '{old_status}' to '{task.status}'."
             ),
         )
 
     return task
+
 
 @router.delete("/{task_id}")
 def delete_task(
