@@ -1,3 +1,5 @@
+import json
+from app.core.redis_client import redis_client
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -44,8 +46,11 @@ def create_task(
     db.commit()
     db.refresh(new_task)
 
-    return new_task
+    # Invalidate cached task lists for this user
+    for key in redis_client.scan_iter(f"tasks:{current_user.id}:*"):
+        redis_client.delete(key)
 
+    return new_task
 
 @router.get("/", response_model=list[TaskResponse])
 def get_tasks(
@@ -58,6 +63,16 @@ def get_tasks(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    cache_key = (
+        f"tasks:{current_user.id}:"
+        f"{status}:{assignee}:{start_date}:{end_date}:{skip}:{limit}"
+    )
+
+    cached_tasks = redis_client.get(cache_key)
+
+    if cached_tasks:
+        return json.loads(cached_tasks)
+
     query = db.query(Task).filter(Task.owner_id == current_user.id)
 
     if status:
@@ -72,15 +87,20 @@ def get_tasks(
     if end_date:
         query = query.filter(Task.due_date <= end_date)
 
-    tasks = (
-        query
-        .offset(skip)
-        .limit(limit)
-        .all()
+    tasks = query.offset(skip).limit(limit).all()
+
+    response = [
+        TaskResponse.model_validate(task).model_dump(mode="json")
+        for task in tasks
+    ]
+
+    redis_client.setex(
+        cache_key,
+        60,
+        json.dumps(response)
     )
 
-    return tasks
-
+    return response
 
 @router.put("/{task_id}", response_model=TaskResponse)
 def update_task(
@@ -128,7 +148,8 @@ def update_task(
                 f"from '{old_status}' to '{task.status}'."
             ),
         )
-
+    for key in redis_client.scan_iter(f"tasks:{current_user.id}:*"):
+        redis_client.delete(key)
     return task
 
 
@@ -152,5 +173,8 @@ def delete_task(
 
     db.delete(task)
     db.commit()
+
+    for key in redis_client.scan_iter(f"tasks:{current_user.id}:*"):
+        redis_client.delete(key)
 
     return {"message": "Task deleted successfully"}
