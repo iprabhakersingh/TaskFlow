@@ -11,6 +11,7 @@ from app.core.dependencies import get_current_user
 
 from typing import Optional
 from datetime import datetime
+from app.tasks.notification_tasks import create_notification
 
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
 
@@ -80,6 +81,7 @@ def get_tasks(
 
     return tasks
 
+
 @router.put("/{task_id}", response_model=TaskResponse)
 def update_task(
     task_id: int,
@@ -97,7 +99,13 @@ def update_task(
     )
 
     if not task:
-        raise HTTPException(status_code=404, detail="Task not found")
+        raise HTTPException(
+            status_code=404,
+            detail="Task not found"
+        )
+
+    # Store the old assignee before updating
+    old_assignee = task.assignee
 
     update_data = task_data.model_dump(exclude_unset=True)
 
@@ -107,8 +115,21 @@ def update_task(
     db.commit()
     db.refresh(task)
 
-    return task
+    # Trigger background notification if assignee changed
+    if (
+        "assignee" in update_data
+        and old_assignee != task.assignee
+    ):
+        create_notification.delay(
+            user_id=current_user.id,
+            task_id=task.id,
+            message=(
+                f"Task '{task.title}' was reassigned "
+                f"from '{old_assignee}' to '{task.assignee}'."
+            ),
+        )
 
+    return task
 
 @router.delete("/{task_id}")
 def delete_task(

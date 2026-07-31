@@ -1,8 +1,11 @@
 from app.core.celery_app import celery_app
 
 from app.db.database import SessionLocal
-from app.models.notification import Notification
 
+from app.models.user import User
+from app.models.project import Project
+from app.models.task import Task
+from app.models.notification import Notification
 
 @celery_app.task
 def create_notification(
