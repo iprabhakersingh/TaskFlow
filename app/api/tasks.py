@@ -27,12 +27,14 @@ def create_task(
         raise HTTPException(status_code=404, detail="Project not found")
 
     new_task = Task(
-        title=task.title,
-        description=task.description,
-        status=task.status,
-        project_id=task.project_id,
-        owner_id=current_user.id
-    )
+    title=task.title,
+    description=task.description,
+    status=task.status,
+    assignee=task.assignee,
+    due_date=task.due_date,
+    project_id=task.project_id,
+    owner_id=current_user.id
+)
 
     db.add(new_task)
     db.commit()
