@@ -126,6 +126,7 @@ def update_task(
 
     # Store old status before updating
     old_status = task.status
+    old_assignee = task.assignee
 
     update_data = task_data.model_dump(exclude_unset=True)
 
@@ -148,6 +149,21 @@ def update_task(
                 f"from '{old_status}' to '{task.status}'."
             ),
         )
+
+
+    if (
+        "assignee" in update_data
+        and old_assignee != task.assignee
+    ):
+        create_notification.delay(
+            user_id=current_user.id,
+            task_id=task.id,
+            message=(
+                f"Task '{task.title}' was reassigned "
+                f"from '{old_assignee}' to '{task.assignee}'."
+            ),
+        )
+        
     for key in redis_client.scan_iter(f"tasks:{current_user.id}:*"):
         redis_client.delete(key)
     return task
