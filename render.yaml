@@ -3,7 +3,6 @@ services:
   - type: pserv
     name: taskflow-db
     plan: free
-    postgresMajorVersion: "16"
 
   # Redis
   - type: redis
