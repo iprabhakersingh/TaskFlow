@@ -1,10 +1,11 @@
 from celery import Celery
 from celery.schedules import crontab
+import os
 
 celery_app = Celery(
     "taskflow",
-    broker="redis://redis:6379/0",
-    backend="redis://redis:6379/0",
+    broker=os.getenv("REDIS_URL", "redis://redis:6379/0"),
+    backend=os.getenv("REDIS_URL", "redis://redis:6379/0"),
 )
 
 celery_app.conf.update(
