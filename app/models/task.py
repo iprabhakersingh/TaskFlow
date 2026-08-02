@@ -23,7 +23,7 @@ class Task(Base):
     owner = relationship("User")
 
     notifications = relationship(
-    "Notification",
-    back_populates="task",
-    cascade="all, delete-orphan"
+        "Notification",
+        back_populates="task",
+        cascade="all, delete-orphan",
     )

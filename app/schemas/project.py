@@ -1,13 +1,16 @@
 from pydantic import BaseModel
 from datetime import datetime
 
+
 class ProjectCreate(BaseModel):
     name: str
     description: str | None = None
 
+
 class ProjectUpdate(BaseModel):
     name: str
     description: str | None = None
+
 
 class ProjectResponse(BaseModel):
     id: int

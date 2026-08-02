@@ -7,6 +7,7 @@ from app.db.database import get_db
 from app.models.task import Task
 from app.models.project import Project
 from app.models.user import User
+from app.models.notification import Notification
 
 from app.schemas.task import TaskCreate, TaskUpdate, TaskResponse
 from app.core.dependencies import get_current_user
@@ -51,6 +52,7 @@ def create_task(
         redis_client.delete(key)
 
     return new_task
+
 
 @router.get("/", response_model=list[TaskResponse])
 def get_tasks(
@@ -102,6 +104,7 @@ def get_tasks(
 
     return response
 
+
 @router.put("/{task_id}", response_model=TaskResponse)
 def update_task(
     task_id: int,
@@ -150,7 +153,6 @@ def update_task(
             ),
         )
 
-
     if (
         "assignee" in update_data
         and old_assignee != task.assignee
@@ -186,6 +188,10 @@ def delete_task(
 
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
+
+    db.query(Notification).filter(
+        Notification.task_id == task.id
+    ).delete(synchronize_session=False)
 
     db.delete(task)
     db.commit()

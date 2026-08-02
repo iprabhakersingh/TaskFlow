@@ -50,8 +50,12 @@ def signup(
     return new_user
 
 
-@router.post("/login", response_model=Token, summary="User Login",
-    description="Enter your registered email in the 'username' field.")
+@router.post(
+    "/login",
+    response_model=Token,
+    summary="User Login",
+    description="Enter your registered email in the 'username' field."
+)
 def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)

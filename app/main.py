@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 
 from app.db.database import Base, engine
-from app.models.user import User
-from app.models.project import Project
-from app.models.task import Task
+from app.models.user import User              # noqa: F401
+from app.models.project import Project        # noqa: F401
+from app.models.task import Task              # noqa: F401
 
 from app.api.auth import router as auth_router
 from app.api.project import router as project_router
