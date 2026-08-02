@@ -61,6 +61,15 @@ jobs:
         run: |
           flake8 .
 
+      - name: Build Docker Compose
+        run: docker compose up -d --build
+
+      - name: Wait for containers
+        run: sleep 15
+
       - name: Run Tests
-        run: |
-          pytest -v
+        run: docker compose exec -T app pytest -v
+
+      - name: Shutdown Docker
+        if: always()
+        run: docker compose down
