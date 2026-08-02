@@ -4,10 +4,11 @@ services:
     name: taskflow-db
     plan: free
 
-  # Redis
-  - type: redis
+  # Redis (Render Key Value)
+  - type: keyvalue
     name: taskflow-redis
     plan: free
+    ipAllowList: []
 
   # FastAPI Web Service
   - type: web
@@ -21,15 +22,19 @@ services:
         fromDatabase:
           name: taskflow-db
           property: connectionString
+
       - key: REDIS_URL
         fromService:
-          type: redis
+          type: keyvalue
           name: taskflow-redis
           property: connectionString
+
       - key: SECRET_KEY
         sync: false
+
       - key: ALGORITHM
         value: HS256
+
       - key: ACCESS_TOKEN_EXPIRE_MINUTES
         value: "30"
 
@@ -46,15 +51,19 @@ services:
         fromDatabase:
           name: taskflow-db
           property: connectionString
+
       - key: REDIS_URL
         fromService:
-          type: redis
+          type: keyvalue
           name: taskflow-redis
           property: connectionString
+
       - key: SECRET_KEY
         sync: false
+
       - key: ALGORITHM
         value: HS256
+
       - key: ACCESS_TOKEN_EXPIRE_MINUTES
         value: "30"
 
@@ -71,14 +80,18 @@ services:
         fromDatabase:
           name: taskflow-db
           property: connectionString
+
       - key: REDIS_URL
         fromService:
-          type: redis
+          type: keyvalue
           name: taskflow-redis
           property: connectionString
+
       - key: SECRET_KEY
         sync: false
+
       - key: ALGORITHM
         value: HS256
+
       - key: ACCESS_TOKEN_EXPIRE_MINUTES
         value: "30"
