@@ -1,5 +1,6 @@
 import uuid
 
+
 def test_user_signup(client):
     unique = uuid.uuid4().hex[:8]
 
