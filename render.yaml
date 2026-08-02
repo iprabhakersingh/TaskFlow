@@ -1,9 +1,9 @@
-services:
-  # PostgreSQL
-  - type: pserv
-    name: taskflow-db
+databases:
+  - name: taskflow-db
     plan: free
+    ipAllowList: []
 
+services:
   # Redis (Render Key Value)
   - type: keyvalue
     name: taskflow-redis
@@ -17,6 +17,7 @@ services:
     dockerfilePath: ./Dockerfile
     plan: free
     autoDeploy: true
+
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -46,6 +47,7 @@ services:
     dockerCommand: celery -A app.core.celery_app:celery_app worker --loglevel=info
     plan: free
     autoDeploy: true
+
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -75,6 +77,7 @@ services:
     dockerCommand: celery -A app.core.celery_app:celery_app beat --loglevel=info
     plan: free
     autoDeploy: true
+
     envVars:
       - key: DATABASE_URL
         fromDatabase:
