@@ -6,6 +6,10 @@ TaskFlow allows users to create projects, manage tasks, assign users, receive au
 
 This project was built as part of a Backend Engineer Take-Home Assignment.
 
+## Repository
+
+https://github.com/iprabhakersingh/TaskFlow
+
 ---
 
 | Requirement | Status |
@@ -54,9 +58,9 @@ Each task contains
 - Title
 - Description
 - Status
-  - Todo
+  - Pending
   - In Progress
-  - Done
+  - Completed
 - Assignee
 - Due Date
 
@@ -165,6 +169,11 @@ taskflow
 │   └── main.py
 │
 ├── tests
+│    ├── conftest.py
+│    ├── test_authorization.py
+│    ├── test_cache.py
+│    ├── test_core_flow.py
+│    ├── test_notifications.py
 │
 ├── Dockerfile
 ├── docker-compose.yml
@@ -264,52 +273,83 @@ ACCESS_TOKEN_EXPIRE_MINUTES=30
 
 ---
 
-# Running Tests
+## Testing
 
-```
-pytest -v
-```
+The project includes an automated test suite covering authentication, authorization, CRUD operations, cache behavior, and background notification workflows.
 
-The test suite covers
+Test suite includes:
 
+- Authentication
 - Authorization
-- Core API flow
-- Cache invalidation
-- Background notifications
+- Project CRUD
+- Task CRUD
+- Redis cache behaviour
+- Notification flow
+- Background job triggering
+
+The project also uses **Flake8** to enforce Python code quality and style consistency.
+
+Run locally:
+
+```bash
+flake8
+pytest -v 
+```
 
 ---
 
-# CI/CD
+## CI/CD
 
-A GitHub Actions workflow is configured to automatically validate every push to the repository.
+GitHub Actions is configured to automatically validate every push to the repository.
 
-The pipeline performs the following steps:
+The CI pipeline performs the following steps:
 
-- Checks out the source code
-- Builds the Docker Compose stack
-- Starts the application services
-- Waits for the containers to become ready
+- Checks out the repository
+- Sets up Python 3.11
+- Installs project dependencies
+- Runs Flake8 for code quality checks
+- Creates the required `.env` file for the CI environment
+- Builds the complete Docker Compose stack
+- Waits for all services to become healthy
 - Executes the complete Pytest test suite
-- Reports the build status
+- Shuts down the Docker containers after testing
 
-**Current Status:** ✅ All CI tests are passing successfully.
+**Current Status:** ✅ All Flake8 checks and Pytest test cases are passing successfully.
+
+### CI Status
+
+- ✅ Flake8 linting passed
+- ✅ Docker Compose build passed
+- ✅ Pytest test suite passed
+- ✅ GitHub Actions pipeline passing
+  
 ![CI](https://github.com/iprabhakersingh/TaskFlow/actions/workflows/ci.yml/badge.svg)
 
 ---
 
+## Development Process
+
+The repository contains incremental commits demonstrating the development process rather than a single final commit, allowing reviewers to observe the project's evolution.
+
 # Deployment (Railway)
 
-The application is deployed using Railway.
+Railway Deployment:
 
-## Services
+https://taskflow-production-28d0.up.railway.app/
 
-The deployment consists of five Railway services:
+Swagger UI:
 
-- TaskFlow API
-- PostgreSQL Database
-- Redis
-- Celery Worker
-- Celery Beat Scheduler
+https://taskflow-production-28d0.up.railway.app/docs
+
+### Components (Services)
+
+- **TaskFlow** – FastAPI application serving the REST API.
+- **PostgreSQL** – Primary relational database.
+- **Redis** – Message broker and caching layer.
+- **Celery Worker** – Executes asynchronous background tasks.
+- **Celery Beat** – Schedules periodic tasks (e.g., checking overdue tasks).
+
+The FastAPI application communicates with PostgreSQL for persistent storage and Redis for caching and task queuing. Celery Worker consumes tasks from Redis, while Celery Beat periodically schedules background jobs.
 
 ## Deployment Steps
 
@@ -327,21 +367,20 @@ The deployment consists of five Railway services:
 
 Once deployed, the application becomes accessible through the Railway-generated public URL.
 
+## Architecture
+
+
+                 Railway
+                    │
+     ┌──────────────┴──────────────┐
+     │                             │
+ FastAPI API                  PostgreSQL
+     │
+     ├──────────────► Redis
+     │                    │
+     │                    ├── Celery Worker
+     │                    └── Celery Beat
 ---
-
-                        Railway
-                           │
-      ┌────────────────────┼────────────────────┐
-      │                    │                    │
-      ▼                    ▼                    ▼
- FastAPI API         PostgreSQL           Redis
-      │                                       │
-      │                                       ▼
-      │                                Celery Worker
-      │                                       ▲
-      │                                       │
-      └────────────── Celery Beat ────────────┘
-
 
 # API Documentation
 
@@ -446,3 +485,7 @@ This project was developed as a backend engineering assignment with the goal of 
 **Prabhaker Singh**
 
 Backend Engineer | FastAPI | PostgreSQL | Redis | Celery | Docker
+
+## License
+
+This project was developed for a Backend Engineer Take-Home Assignment and is intended for educational and evaluation purposes.
