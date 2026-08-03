@@ -314,7 +314,7 @@ The CI pipeline performs the following steps:
 - Executes the complete Pytest test suite
 - Shuts down the Docker containers after testing
 
-**Current Status:** ✅ All Flake8 checks and Pytest test cases are passing successfully.![CI](https://github.com/iprabhakersingh/TaskFlow/actions/workflows/ci.yml/badge.svg)
+**Current Status:** ✅ All Flake8 checks and Pytest test cases are passing successfully.   ![CI](https://github.com/iprabhakersingh/TaskFlow/actions/workflows/ci.yml/badge.svg)
 
 ### CI Status
 
