@@ -8,6 +8,23 @@ This project was built as part of a Backend Engineer Take-Home Assignment.
 
 ---
 
+| Requirement | Status |
+|-------------|--------|
+| Authentication | ✅ |
+| Project & Task CRUD | ✅ |
+| Authorization | ✅ |
+| Background Notifications (Celery) | ✅ |
+| Redis Caching & Invalidation | ✅ |
+| Health & Metrics Endpoints | ✅ |
+| Docker & Docker Compose | ✅ |
+| **GitHub Actions CI (Passing)** | ✅ |
+| Test Suite (Pytest) | ✅ |
+| Railway Deployment | ✅ |
+
+### Minor UI Limitation
+
+FastAPI's Swagger UI uses the standard OAuth2 form, where the login field is labeled **"username"**. In this project, authentication is performed using the user's **email address**, so users should provide their email in the `username` field. This is a UI labeling limitation of the default Swagger form rather than a backend authentication issue.
+
 # Features
 
 ## Authentication
@@ -187,37 +204,36 @@ taskflow
 
 ---
 
-# Running Locally
+## Local Setup
 
-Clone repository
+Clone the repository
 
 ```bash
 git clone <repository-url>
 ```
 
-Move into project
+Navigate to the project
 
 ```bash
 cd taskflow
 ```
 
-Create environment file
+Copy the environment file
 
 ```bash
 cp .env.example .env
 ```
 
-Fill the environment variables.
+Update the environment variables.
 
----
+Start the application
 
 ## Run with Docker
 
 ```bash
 docker compose up --build
 ```
-
-Application
+The API will be available at
 
 ```
 http://localhost:8000
@@ -228,7 +244,6 @@ Swagger
 ```
 http://localhost:8000/docs
 ```
-
 ---
 
 # Environment Variables
@@ -266,29 +281,67 @@ The test suite covers
 
 # CI/CD
 
-GitHub Actions automatically
+A GitHub Actions workflow is configured to automatically validate every push to the repository.
 
-- Builds Docker containers
-- Starts required services
-- Executes the complete pytest suite
+The pipeline performs the following steps:
 
-Pipeline passes before deployment.
+- Checks out the source code
+- Builds the Docker Compose stack
+- Starts the application services
+- Waits for the containers to become ready
+- Executes the complete Pytest test suite
+- Reports the build status
+
+**Current Status:** ✅ All CI tests are passing successfully.
+![CI](https://github.com/iprabhakersingh/TaskFlow/actions/workflows/ci.yml/badge.svg)
 
 ---
 
-# Deployment
+# Deployment (Railway)
 
-The application is deployed on Railway.
+The application is deployed using Railway.
 
-Services deployed
+## Services
 
-- FastAPI API
-- PostgreSQL
+The deployment consists of five Railway services:
+
+- TaskFlow API
+- PostgreSQL Database
 - Redis
 - Celery Worker
 - Celery Beat Scheduler
 
+## Deployment Steps
+
+1. Push the project to GitHub.
+2. Create a new Railway project.
+3. Deploy the FastAPI application from the GitHub repository.
+4. Add a PostgreSQL service.
+5. Add a Redis service.
+6. Configure all required environment variables.
+7. Create separate Railway services for:
+   - Celery Worker
+   - Celery Beat
+8. Redeploy the services.
+9. Verify the deployment using the `/docs` endpoint.
+
+Once deployed, the application becomes accessible through the Railway-generated public URL.
+
 ---
+
+                        Railway
+                           │
+      ┌────────────────────┼────────────────────┐
+      │                    │                    │
+      ▼                    ▼                    ▼
+ FastAPI API         PostgreSQL           Redis
+      │                                       │
+      │                                       ▼
+      │                                Celery Worker
+      │                                       ▲
+      │                                       │
+      └────────────── Celery Beat ────────────┘
+
 
 # API Documentation
 
@@ -383,6 +436,10 @@ If given additional time, I would
 | Test Suite | ✅ |
 
 ---
+
+## Learning & Design Approach
+
+This project was developed as a backend engineering assignment with the goal of applying production-oriented backend concepts, including authentication, authorization, background processing, caching, containerization, automated testing, CI/CD, and cloud deployment. The implementation prioritizes clean architecture, readability, and maintainability while satisfying the assignment requirements.
 
 # Author
 
