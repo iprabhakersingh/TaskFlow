@@ -314,7 +314,7 @@ The CI pipeline performs the following steps:
 - Executes the complete Pytest test suite
 - Shuts down the Docker containers after testing
 
-**Current Status:** ✅ All Flake8 checks and Pytest test cases are passing successfully.
+**Current Status:** ✅ All Flake8 checks and Pytest test cases are passing successfully.![CI](https://github.com/iprabhakersingh/TaskFlow/actions/workflows/ci.yml/badge.svg)
 
 ### CI Status
 
@@ -322,8 +322,6 @@ The CI pipeline performs the following steps:
 - ✅ Docker Compose build passed
 - ✅ Pytest test suite passed
 - ✅ GitHub Actions pipeline passing
-  
-![CI](https://github.com/iprabhakersingh/TaskFlow/actions/workflows/ci.yml/badge.svg)
 
 ---
 
@@ -369,7 +367,9 @@ Once deployed, the application becomes accessible through the Railway-generated 
 
 ## Architecture
 
+## Architecture
 
+```text
                  Railway
                     │
      ┌──────────────┴──────────────┐
@@ -380,7 +380,7 @@ Once deployed, the application becomes accessible through the Railway-generated 
      │                    │
      │                    ├── Celery Worker
      │                    └── Celery Beat
----
+
 
 # API Documentation
 
