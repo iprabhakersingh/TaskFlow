@@ -365,11 +365,11 @@ The FastAPI application communicates with PostgreSQL for persistent storage and 
 
 Once deployed, the application becomes accessible through the Railway-generated public URL.
 
-## Architecture
+---
 
 ## Architecture
 
-```text
+```
                  Railway
                     │
      ┌──────────────┴──────────────┐
@@ -381,6 +381,8 @@ Once deployed, the application becomes accessible through the Railway-generated 
      │                    ├── Celery Worker
      │                    └── Celery Beat
 
+```
+---
 
 # API Documentation
 
